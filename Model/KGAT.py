@@ -336,12 +336,17 @@ class KGAT(object):
 
         all_embeddings = [pre_embeddings]
         for k in range(self.n_layers):
+
+            ## AGGREGATION
             # line 1 in algorithm 1 [RM-GCN, KDD'2018], aggregator layer: weighted sum
             temp_embed = []
             for f in range(self.n_fold):
                 temp_embed.append(tf.sparse_tensor_dense_matmul(A_fold_hat[f], pre_embeddings))
             embeddings = tf.concat(temp_embed, 0)
 
+            print(pre_embeddings.shape, embeddings.shape, self.n_fold, self.weights['W_mlp_%d' % k].shape)
+
+            ## CONVOLUTION
             # line 2 in algorithm 1 [RM-GCN, KDD'2018], aggregating the previsou embeddings
             embeddings = tf.concat([pre_embeddings, embeddings], 1)
             pre_embeddings = tf.nn.relu(
