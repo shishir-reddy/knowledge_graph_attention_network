@@ -164,7 +164,7 @@ class KGAT(object):
             all_weights['W_mlp_local_%d' %k] = tf.Variable(
                 initializer([self.n_fold - 1, 1]), name='W_mlp_local_%d' % k)
             all_weights['W_mlp_local_%d_last' %k] = tf.Variable(
-                initializer(1), name='W_mlp_local_%d_last' % k)
+                initializer([1]), name='W_mlp_local_%d_last' % k)
 
         return all_weights
 
