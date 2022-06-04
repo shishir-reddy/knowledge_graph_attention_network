@@ -139,7 +139,7 @@ class KGAT(object):
 
         self.weight_size_list = [self.emb_dim] + self.weight_size
 
-        print(self.weight_size_list, file=sys.stderr)
+        print(self.weight_size_list)
 
 
         for k in range(self.n_layers):
