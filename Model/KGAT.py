@@ -351,6 +351,8 @@ class KGAT(object):
             temp_embed = []
             for f in range(self.n_fold):
                 temp_embed.append(tf.sparse_tensor_dense_matmul(A_fold_hat[f], pre_embeddings))
+            
+            print(len(temp_embed), temp_embed[0].shape)
             embeddings = tf.concat(temp_embed, 0)
 
             ## CONVOLUTION
@@ -359,7 +361,6 @@ class KGAT(object):
             print("Pre Conv: ", pre_embeddings.shape, embeddings.shape, self.n_fold, self.weights['W_mlp_%d' % k].shape)
             pre_embeddings = tf.nn.relu(
                 tf.matmul(embeddings, self.weights['W_mlp_%d' % k]) + self.weights['b_mlp_%d' % k])
-            print("Post Conv: ", pre_embeddings.shape, embeddings.shape, self.n_fold, self.weights['W_mlp_%d' % k].shape)
 
 
             pre_embeddings = tf.nn.dropout(pre_embeddings, 1 - self.mess_dropout[k])
