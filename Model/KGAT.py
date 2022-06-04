@@ -354,7 +354,7 @@ class KGAT(object):
                 print(temp_embed[-1].shape, end=' ')
             print('\n')
             embeddings = tf.concat(temp_embed, 0)
-            test_embeddings = tf.convert_to_tensor(temp_embed)
+            test_embeddings = tf.convert_to_tensor(temp_embed[:-1])
             print("tshape: ", test_embeddings.shape)
 
             ## CONVOLUTION
