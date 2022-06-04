@@ -351,8 +351,8 @@ class KGAT(object):
             temp_embed = []
             for f in range(self.n_fold):
                 temp_embed.append(tf.sparse_tensor_dense_matmul(A_fold_hat[f], pre_embeddings))
+                print(temp_embed[-1].shape, end=' ')
             
-            print(len(temp_embed), temp_embed[0].shape)
             embeddings = tf.concat(temp_embed, 0)
 
             ## CONVOLUTION
