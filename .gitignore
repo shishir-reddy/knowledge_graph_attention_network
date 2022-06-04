@@ -3,3 +3,4 @@ Model/__pycache__/*
 Model/utility/__pycache__/*
 Model/__pycache__
 Model/utility/__pycache__
+Model/weights/*
