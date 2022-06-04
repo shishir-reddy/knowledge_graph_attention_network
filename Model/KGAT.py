@@ -354,6 +354,8 @@ class KGAT(object):
                 print(temp_embed[-1].shape, end=' ')
             print('\n')
             embeddings = tf.concat(temp_embed, 0)
+            test_embeddings = tf.convert_to_tensor(temp_embed)
+            print("tshape: ", test_embeddings.shape)
 
             ## CONVOLUTION
             # line 2 in algorithm 1 [RM-GCN, KDD'2018], aggregating the previsou embeddings
