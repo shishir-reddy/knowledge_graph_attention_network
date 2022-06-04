@@ -359,7 +359,7 @@ class KGAT(object):
 
             ## CONVOLUTION
             # line 2 in algorithm 1 [RM-GCN, KDD'2018], aggregating the previsou embeddings
-            print("Pre Conv: ", pre_embeddings.shape, embeddings.shape, self.n_fold, self.weights['W_mlp_%d' % k].shape)
+            print("Pre Conv: ", pre_embeddings.shape, embeddings.shape, self.n_fold, self.weights['W_mlp_%d' % k].shape, self.weights['user_embed'].shape, self.weights['entity_embed'].shape)
 
             embeddings = tf.concat([pre_embeddings, embeddings], 1)
             pre_embeddings = tf.nn.relu(
