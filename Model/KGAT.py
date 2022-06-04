@@ -351,16 +351,15 @@ class KGAT(object):
             temp_embed = []
             for f in range(self.n_fold):
                 temp_embed.append(tf.sparse_tensor_dense_matmul(A_fold_hat[f], pre_embeddings))
+                print(temp_embed[-1].shape, end=' ')
             
             embeddings = tf.concat(temp_embed, 0)
 
-            test_embeddings = tf.concat(temp_embed, 1)
-            print(test_embeddings.shape)
-
             ## CONVOLUTION
             # line 2 in algorithm 1 [RM-GCN, KDD'2018], aggregating the previsou embeddings
-            embeddings = tf.concat([pre_embeddings, embeddings], 1)
             print("Pre Conv: ", pre_embeddings.shape, embeddings.shape, self.n_fold, self.weights['W_mlp_%d' % k].shape)
+
+            embeddings = tf.concat([pre_embeddings, embeddings], 1)
             pre_embeddings = tf.nn.relu(
                 tf.matmul(embeddings, self.weights['W_mlp_%d' % k]) + self.weights['b_mlp_%d' % k])
 
