@@ -359,7 +359,8 @@ class KGAT(object):
             test_embeddings = tf.convert_to_tensor(temp_embed[:-1])
 
             print(self.weights['W_mlp_local_%d' %k].shape, test_embeddings.shape)
-            test_prod = tf.scalar_mul(self.weights['W_mlp_local_%d' %k], test_embeddings)
+            test_prod = self.weights['W_mlp_local_%d' %k] * test_embeddings
+            print(test_prod.shape)
 
             ## CONVOLUTION
             # line 2 in algorithm 1 [RM-GCN, KDD'2018], aggregating the previsou embeddings
