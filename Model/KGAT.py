@@ -8,6 +8,7 @@ import tensorflow as tf
 import os
 import numpy as np
 import scipy.sparse as sp
+import sys
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 class KGAT(object):
@@ -138,6 +139,8 @@ class KGAT(object):
 
         self.weight_size_list = [self.emb_dim] + self.weight_size
 
+        print(self.weight_size_list, file=sys.stderr)
+
 
         for k in range(self.n_layers):
             all_weights['W_gc_%d' %k] = tf.Variable(
@@ -154,6 +157,12 @@ class KGAT(object):
                 initializer([2 * self.weight_size_list[k], self.weight_size_list[k+1]]), name='W_mlp_%d' % k)
             all_weights['b_mlp_%d' % k] = tf.Variable(
                 initializer([1, self.weight_size_list[k+1]]), name='b_mlp_%d' % k)
+
+            # Build local filter weights
+            # Each local filter contains one weight for the self embedding, and one for each of the top n neighbors
+            # Single local filter implementation
+            all_weights['W_mlp_local_%d' %k] = tf.Variable(
+                initializer([1, self.n_fold + 1]), name='W_mlp_local_%d' % k)
 
         return all_weights
 
