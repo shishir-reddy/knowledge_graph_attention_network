@@ -11,7 +11,6 @@ import scipy.sparse as sp
 import sys
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
-tf.enable_eager_execution()
 
 class KGAT(object):
     def __init__(self, data_config, pretrain_data, args):
@@ -383,7 +382,7 @@ class KGAT(object):
             
             embeddings_list = tf.convert_to_tensor(embeddings_list)
             embeddings = tf.nn.relu(
-                tf.add_n(list(tf.reshape(self.weights['W_mlp_local_comb_%d' %k], [-1,1,1]) * embeddings_list))
+                sum(tf.reshape(self.weights['W_mlp_local_comb_%d' %k], [-1,1,1]) * embeddings_list)
             )
             print(embeddings.shape)
             # test_prod = tf.concat([tf.concat(self.weights['W_mlp_local_%d' %k] * test_embeddings, 0), last_embedding], 0)
@@ -401,7 +400,7 @@ class KGAT(object):
             #     tf.matmul(embeddings, self.weights['W_mlp_%d' % k]) + self.weights['b_mlp_%d' % k])
 
             pre_embeddings = tf.nn.relu(
-                tf.add_n(tf.reshape(self.weights['W_mlp_self_neighbor_comb_%d' %k], [-1,1,1]) * embeddings)
+                sum(tf.reshape(self.weights['W_mlp_self_neighbor_comb_%d' %k], [-1,1,1]) * embeddings)
             )
             # print("Post Conv: ", pre_embeddings.shape, embeddings.shape, self.n_fold, self.weights['W_mlp_%d' % k].shape)
 
