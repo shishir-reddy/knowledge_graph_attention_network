@@ -395,6 +395,7 @@ class KGAT(object):
 
             # embeddings = tf.concat([pre_embeddings, embeddings], 1)
             embeddings = tf.convert_to_tensor([pre_embeddings, embeddings])
+            print(embeddings.shape)
 
             # pre_embeddings = tf.nn.relu(
             #     tf.matmul(embeddings, self.weights['W_mlp_%d' % k]) + self.weights['b_mlp_%d' % k])
@@ -402,6 +403,8 @@ class KGAT(object):
             pre_embeddings = tf.nn.relu(
                 tf.reduce_sum(tf.reshape(self.weights['W_mlp_self_neighbor_comb_%d' %k], [-1,1,1]) * embeddings, 0)
             )
+
+            print(pre_embeddins.shape)
             # print("Post Conv: ", pre_embeddings.shape, embeddings.shape, self.n_fold, self.weights['W_mlp_%d' % k].shape)
 
             pre_embeddings = tf.nn.dropout(pre_embeddings, 1 - self.mess_dropout[k])
