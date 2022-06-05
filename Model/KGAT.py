@@ -164,7 +164,7 @@ class KGAT(object):
             all_weights['W_mlp_local_%d' %k] = tf.Variable(
                 initializer([self.n_fold - 1, 1, 1]), name='W_mlp_local_%d' % k)
             all_weights['W_mlp_local_%d_last' %k] = tf.Variable(
-                initializer([1]), name='W_mlp_local_%d_last' % k)
+                initializer([1,1]), name='W_mlp_local_%d_last' % k)
 
         return all_weights
 
@@ -357,10 +357,11 @@ class KGAT(object):
             print('\n')
             embeddings = tf.concat(temp_embed, 0)
             test_embeddings = tf.convert_to_tensor(temp_embed[:-1])
+            last_embedding = temp_embed[-1]
 
-            print(self.weights['W_mlp_local_%d' %k].shape, test_embeddings.shape)
+            print(self.weights['W_mlp_local_%d' %k].shape, test_embeddings.shape, last_embedding.shape)
             # test_prod = self.weights['W_mlp_local_%d' %k][:, :, None] * test_embeddings
-            test_prod = self.weights['W_mlp_local_%d' %k] * test_embeddings
+            test_prod = tf.concat([self.weights['W_mlp_local_%d' %k] * test_embeddings, self.weights['W_mlp_local_%d_last' %k] * last_embedding], 0)
             print(test_prod.shape)
 
             ## CONVOLUTION
