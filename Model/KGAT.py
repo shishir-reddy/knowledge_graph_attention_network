@@ -357,11 +357,12 @@ class KGAT(object):
             print('\n')
             embeddings = tf.concat(temp_embed, 0)
             test_embeddings = tf.convert_to_tensor(temp_embed[:-1])
+            # last_embedding = tf.reshape(temp_embed[-1], (1, temp_embed[-1].shape[0], temp_embed[-1].shape[1]))
             last_embedding = temp_embed[-1]
-
             print(self.weights['W_mlp_local_%d' %k].shape, test_embeddings.shape, last_embedding.shape)
             # test_prod = self.weights['W_mlp_local_%d' %k][:, :, None] * test_embeddings
-            test_prod = tf.concat([self.weights['W_mlp_local_%d' %k] * test_embeddings, self.weights['W_mlp_local_%d_last' %k] * last_embedding], 0)
+            test_prod = tf.concat([tf.concat(self.weights['W_mlp_local_%d' %k] * test_embeddings, 0), last_embedding], 0)
+            # , self.weights['W_mlp_local_%d_last' %k] * last_embedding], 0)
             print(test_prod.shape)
 
             ## CONVOLUTION
