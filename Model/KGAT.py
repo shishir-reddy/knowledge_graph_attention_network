@@ -366,8 +366,8 @@ class KGAT(object):
             for i in range(self.num_local_filters):
                 embeddings_list.append(tf.nn.relu(
                     tf.concat(
-                        [tf.reshape(tf.reshape(self.weights['W_mlp_local_%d' %k], [-1,1,1]) * test_embeddings, [-1, last_embedding.shape[2]]), 
-                        tf.reshape(tf.reshape(self.weights['W_mlp_local_%d_last' %k], [1,1]) * last_embedding, [-1, last_embedding.shape[2]])], 0
+                        [tf.reshape(tf.reshape(self.weights['W_mlp_local_%d_%d' %(i, k)], [-1,1,1]) * test_embeddings, [-1, last_embedding.shape[2]]), 
+                        tf.reshape(tf.reshape(self.weights['W_mlp_local_%d_%d_last' %(i, k)], [1,1]) * last_embedding, [-1, last_embedding.shape[2]])], 0
                     )
                 ))
             
