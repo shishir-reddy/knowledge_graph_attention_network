@@ -393,7 +393,7 @@ class KGAT(object):
             # line 2 in algorithm 1 [RM-GCN, KDD'2018], aggregating the previsou embeddings
             # print("Pre Conv: ", pre_embeddings.shape, embeddings.shape, self.n_fold, self.weights['W_mlp_%d' % k].shape, self.weights['user_embed'].shape, self.weights['entity_embed'].shape)
 
-            # embeddings = tf.concat([pre_embeddings, embeddings], 1)
+            pre_norm_embeddings = tf.concat([pre_embeddings, embeddings], 1)
             embeddings = tf.convert_to_tensor([pre_embeddings, embeddings])
 
             # pre_embeddings = tf.nn.relu(
@@ -403,16 +403,13 @@ class KGAT(object):
                 tf.reduce_sum(tf.reshape(self.weights['W_mlp_self_neighbor_comb_%d' %k], [-1,1,1]) * embeddings, 0)
             )
 
-            print(pre_embeddings.shape)
             # print("Post Conv: ", pre_embeddings.shape, embeddings.shape, self.n_fold, self.weights['W_mlp_%d' % k].shape)
 
             pre_embeddings = tf.nn.dropout(pre_embeddings, 1 - self.mess_dropout[k])
-            print(2, pre_embeddings.shape)
 
             # normalize the distribution of embeddings.
-            norm_embeddings = tf.math.l2_normalize(embeddings, axis=1)
+            norm_embeddings = tf.math.l2_normalize(pre_norm_embeddings, axis=1)
 
-            print(3, norm_embeddings.shape)
 
             all_embeddings += [norm_embeddings]
 
