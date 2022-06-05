@@ -11,6 +11,8 @@ import scipy.sparse as sp
 import sys
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
+tf.enable_eager_execution()
+
 class KGAT(object):
     def __init__(self, data_config, pretrain_data, args):
         self._parse_args(data_config, pretrain_data, args)
@@ -381,7 +383,7 @@ class KGAT(object):
             
             embeddings_list = tf.convert_to_tensor(embeddings_list)
             embeddings = tf.nn.relu(
-                tf.map_fn(tf.add, list(tf.reshape(self.weights['W_mlp_local_comb_%d' %k], [-1,1,1]) * embeddings_list))
+                tf.add_n(list(tf.reshape(self.weights['W_mlp_local_comb_%d' %k], [-1,1,1]) * embeddings_list))
             )
             print(embeddings.shape)
             # test_prod = tf.concat([tf.concat(self.weights['W_mlp_local_%d' %k] * test_embeddings, 0), last_embedding], 0)
