@@ -355,20 +355,23 @@ class KGAT(object):
                 temp_embed.append(tf.sparse_tensor_dense_matmul(A_fold_hat[f], pre_embeddings))
                 print(temp_embed[-1].shape, end=' ')
             print('\n')
-            embeddings = tf.concat(temp_embed, 0)
+            # embeddings = tf.concat(temp_embed, 0)
+            
             test_embeddings = tf.convert_to_tensor(temp_embed[:-1])
             last_embedding = tf.reshape(temp_embed[-1], (1, temp_embed[-1].shape[0], temp_embed[-1].shape[1]))
             # last_embedding = temp_embed[-1]
             print(self.weights['W_mlp_local_%d' %k].shape, test_embeddings.shape, last_embedding.shape)
             # test_prod = self.weights['W_mlp_local_%d' %k][:, :, None] * test_embeddings
             # print(tf.reshape(tf.reshape(self.weights['W_mlp_local_%d' %k], [-1,1,1]) * test_embeddings, [-1, last_embedding.shape[2]]).shape, (tf.reshape(self.weights['W_mlp_local_%d_last' %k], [1,1]) * last_embedding).shape)
-            test_prod = tf.concat(
-                [tf.reshape(tf.reshape(self.weights['W_mlp_local_%d' %k], [-1,1,1]) * test_embeddings, [-1, last_embedding.shape[2]]), 
-                tf.reshape(tf.reshape(self.weights['W_mlp_local_%d_last' %k], [1,1]) * last_embedding, [-1, last_embedding.shape[2]])], 
-                0)
+            embeddings = tf.nn.relu(
+                tf.concat(
+                    [tf.reshape(tf.reshape(self.weights['W_mlp_local_%d' %k], [-1,1,1]) * test_embeddings, [-1, last_embedding.shape[2]]), 
+                    tf.reshape(tf.reshape(self.weights['W_mlp_local_%d_last' %k], [1,1]) * last_embedding, [-1, last_embedding.shape[2]])], 0
+                )
+            )
             # test_prod = tf.concat([tf.concat(self.weights['W_mlp_local_%d' %k] * test_embeddings, 0), last_embedding], 0)
             # , self.weights['W_mlp_local_%d_last' %k] * last_embedding], 0)
-            print(test_prod.shape)
+            # print(test_prod.shape)
 
             ## CONVOLUTION
             # line 2 in algorithm 1 [RM-GCN, KDD'2018], aggregating the previsou embeddings
