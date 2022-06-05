@@ -381,7 +381,7 @@ class KGAT(object):
             
             embeddings_list = tf.convert_to_tensor(embeddings_list)
             embeddings = tf.nn.relu(
-                tf.add_n(tf.reshape(self.weights['W_mlp_local_comb_%d' %k], [-1,1,1]) * embeddings_list)
+                tf.add_n(list(tf.reshape(self.weights['W_mlp_local_comb_%d' %k], [-1,1,1]) * embeddings_list))
             )
             print(embeddings.shape)
             # test_prod = tf.concat([tf.concat(self.weights['W_mlp_local_%d' %k] * test_embeddings, 0), last_embedding], 0)
