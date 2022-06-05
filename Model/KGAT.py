@@ -357,8 +357,8 @@ class KGAT(object):
             print('\n')
             embeddings = tf.concat(temp_embed, 0)
             test_embeddings = tf.convert_to_tensor(temp_embed[:-1])
-            # last_embedding = tf.reshape(temp_embed[-1], (1, temp_embed[-1].shape[0], temp_embed[-1].shape[1]))
-            last_embedding = temp_embed[-1]
+            last_embedding = tf.reshape(temp_embed[-1], (1, temp_embed[-1].shape[0], temp_embed[-1].shape[1]))
+            # last_embedding = temp_embed[-1]
             print(self.weights['W_mlp_local_%d' %k].shape, test_embeddings.shape, last_embedding.shape)
             # test_prod = self.weights['W_mlp_local_%d' %k][:, :, None] * test_embeddings
             test_prod = tf.reshape(
