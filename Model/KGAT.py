@@ -162,7 +162,7 @@ class KGAT(object):
             # Each local filter contains one weight for the self embedding, and one for each of the top n neighbors
             # Single local filter implementation
             all_weights['W_mlp_local_%d' %k] = tf.Variable(
-                initializer([self.n_fold - 1, 1]), name='W_mlp_local_%d' % k)
+                initializer([self.n_fold - 1]), name='W_mlp_local_%d' % k)
             all_weights['W_mlp_local_%d_last' %k] = tf.Variable(
                 initializer([1]), name='W_mlp_local_%d_last' % k)
 
@@ -359,7 +359,7 @@ class KGAT(object):
             test_embeddings = tf.convert_to_tensor(temp_embed[:-1])
 
             print(self.weights['W_mlp_local_%d' %k].shape, test_embeddings.shape)
-            test_prod = tf.matmul(test_embeddings, self.weights['W_mlp_local_%d' %k])
+            test_prod = self.weights['W_mlp_local_%d' %k][:, :, None] * test_embeddings
             print(test_prod.shape)
 
             ## CONVOLUTION
