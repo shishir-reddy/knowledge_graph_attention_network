@@ -139,8 +139,7 @@ class KGAT(object):
 
         self.weight_size_list = [self.emb_dim] + self.weight_size
 
-        print("weight size list: ", self.weight_size_list)
-
+        self.num_local_filters = 3
 
         for k in range(self.n_layers):
             all_weights['W_gc_%d' %k] = tf.Variable(
@@ -160,11 +159,13 @@ class KGAT(object):
 
             # Build local filter weights
             # Each local filter contains one weight for the self embedding, and one for each of the top n neighbors
-            # Single local filter implementation
-            all_weights['W_mlp_local_%d' %k] = tf.Variable(
-                initializer([self.n_fold - 1]), name='W_mlp_local_%d' % k)
-            all_weights['W_mlp_local_%d_last' %k] = tf.Variable(
-                initializer([1]), name='W_mlp_local_%d_last' % k)
+            
+            # Multi local filter implementation
+            for i in range(self.num_local_filters):
+                all_weights['W_mlp_local_%d_%d' %(i, k)] = tf.Variable(
+                    initializer([self.n_fold - 1]), name='W_mlp_local_%d_%d' % k)
+                all_weights['W_mlp_local_1_%d_last' %(i, k)] = tf.Variable(
+                    initializer([1]), name='W_mlp_local_%d_%d_last' % k)
 
         return all_weights
 
@@ -356,19 +357,21 @@ class KGAT(object):
                 print(temp_embed[-1].shape, end=' ')
             print('\n')
             # embeddings = tf.concat(temp_embed, 0)
-            
+
             test_embeddings = tf.convert_to_tensor(temp_embed[:-1])
             last_embedding = tf.reshape(temp_embed[-1], (1, temp_embed[-1].shape[0], temp_embed[-1].shape[1]))
-            # last_embedding = temp_embed[-1]
-            print(self.weights['W_mlp_local_%d' %k].shape, test_embeddings.shape, last_embedding.shape)
-            # test_prod = self.weights['W_mlp_local_%d' %k][:, :, None] * test_embeddings
-            # print(tf.reshape(tf.reshape(self.weights['W_mlp_local_%d' %k], [-1,1,1]) * test_embeddings, [-1, last_embedding.shape[2]]).shape, (tf.reshape(self.weights['W_mlp_local_%d_last' %k], [1,1]) * last_embedding).shape)
-            embeddings = tf.nn.relu(
-                tf.concat(
-                    [tf.reshape(tf.reshape(self.weights['W_mlp_local_%d' %k], [-1,1,1]) * test_embeddings, [-1, last_embedding.shape[2]]), 
-                    tf.reshape(tf.reshape(self.weights['W_mlp_local_%d_last' %k], [1,1]) * last_embedding, [-1, last_embedding.shape[2]])], 0
-                )
-            )
+
+            # Generate embeddings for each local filter
+            embeddings_list = []
+            for i in range(self.num_local_filters):
+                embeddings_list.append(tf.nn.relu(
+                    tf.concat(
+                        [tf.reshape(tf.reshape(self.weights['W_mlp_local_%d' %k], [-1,1,1]) * test_embeddings, [-1, last_embedding.shape[2]]), 
+                        tf.reshape(tf.reshape(self.weights['W_mlp_local_%d_last' %k], [1,1]) * last_embedding, [-1, last_embedding.shape[2]])], 0
+                    )
+                ))
+            
+            print(tf.convert_to_tensor(embeddings_list).shape)
             # test_prod = tf.concat([tf.concat(self.weights['W_mlp_local_%d' %k] * test_embeddings, 0), last_embedding], 0)
             # , self.weights['W_mlp_local_%d_last' %k] * last_embedding], 0)
             # print(test_prod.shape)
