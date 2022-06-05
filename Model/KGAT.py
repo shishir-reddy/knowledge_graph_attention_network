@@ -167,6 +167,14 @@ class KGAT(object):
                 all_weights['W_mlp_local_%d_%d_last' %(i, k)] = tf.Variable(
                     initializer([1]), name='W_mlp_local_%d_%d_last' %(i, k))
 
+            # Combination weight matrix
+            all_weights['W_mlp_local_comb_%d' %k] = tf.Variable(
+                initializer([self.num_local_filters]), name='W_mlp_local_comb_%d' %k)
+            
+            # Self Neighbor combination weight matrix
+            all_weights['W_mlp_self_neighbor_comb_%d' %k] = tf.Variable(
+                initializer([2]), name='W_mlp_self_neighbor_comb_%d' %k)
+
         return all_weights
 
     def _build_model_phase_I(self):
@@ -371,19 +379,29 @@ class KGAT(object):
                     )
                 ))
             
-            print(tf.convert_to_tensor(embeddings_list).shape)
+            embeddings_list = tf.convert_to_tensor(embeddings_list)
+            embeddings = tf.nn.relu(
+                tf.add_n(tf.reshape(self.weights['W_mlp_local_comb_%d' %k], [-1,1,1]) * embeddings_list)
+            )
+            print(embeddings.shape)
             # test_prod = tf.concat([tf.concat(self.weights['W_mlp_local_%d' %k] * test_embeddings, 0), last_embedding], 0)
             # , self.weights['W_mlp_local_%d_last' %k] * last_embedding], 0)
             # print(test_prod.shape)
 
             ## CONVOLUTION
             # line 2 in algorithm 1 [RM-GCN, KDD'2018], aggregating the previsou embeddings
-            print("Pre Conv: ", pre_embeddings.shape, embeddings.shape, self.n_fold, self.weights['W_mlp_%d' % k].shape, self.weights['user_embed'].shape, self.weights['entity_embed'].shape)
+            # print("Pre Conv: ", pre_embeddings.shape, embeddings.shape, self.n_fold, self.weights['W_mlp_%d' % k].shape, self.weights['user_embed'].shape, self.weights['entity_embed'].shape)
 
-            embeddings = tf.concat([pre_embeddings, embeddings], 1)
+            # embeddings = tf.concat([pre_embeddings, embeddings], 1)
+            embeddings = tf.convert_to_tensor([pre_embeddings, embeddings])
+
+            # pre_embeddings = tf.nn.relu(
+            #     tf.matmul(embeddings, self.weights['W_mlp_%d' % k]) + self.weights['b_mlp_%d' % k])
+
             pre_embeddings = tf.nn.relu(
-                tf.matmul(embeddings, self.weights['W_mlp_%d' % k]) + self.weights['b_mlp_%d' % k])
-            print("Post Conv: ", pre_embeddings.shape, embeddings.shape, self.n_fold, self.weights['W_mlp_%d' % k].shape)
+                tf.add_n(tf.reshape(self.weights['W_mlp_self_neighbor_comb_%d' %k], [-1,1,1]) * embeddings)
+            )
+            # print("Post Conv: ", pre_embeddings.shape, embeddings.shape, self.n_fold, self.weights['W_mlp_%d' % k].shape)
 
             pre_embeddings = tf.nn.dropout(pre_embeddings, 1 - self.mess_dropout[k])
 
