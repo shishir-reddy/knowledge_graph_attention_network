@@ -359,7 +359,7 @@ class KGAT(object):
             test_embeddings = tf.convert_to_tensor(temp_embed[:-1])
 
             print(self.weights['W_mlp_local_%d' %k].shape, test_embeddings.shape)
-            test_prod = test_embeddings * self.weights['W_mlp_local_%d' %k]
+            test_prod = tf.matmul(test_embeddings, self.weights['W_mlp_local_%d' %k])
             print(test_prod.shape)
 
             ## CONVOLUTION
