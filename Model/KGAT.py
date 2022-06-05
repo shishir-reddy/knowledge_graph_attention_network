@@ -407,12 +407,16 @@ class KGAT(object):
             # print("Post Conv: ", pre_embeddings.shape, embeddings.shape, self.n_fold, self.weights['W_mlp_%d' % k].shape)
 
             pre_embeddings = tf.nn.dropout(pre_embeddings, 1 - self.mess_dropout[k])
+            print(2, pre_embeddings.shape)
 
             # normalize the distribution of embeddings.
             norm_embeddings = tf.math.l2_normalize(embeddings, axis=1)
 
+            print(3, norm_embeddings.shape)
+
             all_embeddings += [norm_embeddings]
 
+        print([i.shape for i in all_embeddings])
         all_embeddings = tf.concat(all_embeddings, 1)
 
         ua_embeddings, ea_embeddings = tf.split(all_embeddings, [self.n_users, self.n_entities], 0)
