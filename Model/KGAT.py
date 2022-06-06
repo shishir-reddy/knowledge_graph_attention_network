@@ -363,8 +363,8 @@ class KGAT(object):
             temp_embed = []
             for f in range(self.n_fold):
                 temp_embed.append(tf.sparse_tensor_dense_matmul(A_fold_hat[f], pre_embeddings))
-                # print(temp_embed[-1].shape, end=' ')
-            # print('\n')
+
+            # GRAPHSAGE Implementation
             # embeddings = tf.concat(temp_embed, 0)
 
             test_embeddings = tf.convert_to_tensor(temp_embed[:-1])
@@ -384,18 +384,14 @@ class KGAT(object):
             embeddings = tf.nn.relu(
                 tf.reduce_sum(tf.reshape(self.weights['W_mlp_local_comb_%d' %k], [-1,1,1]) * embeddings_list, 0)
             )
-            # print(embeddings.shape)
-            # test_prod = tf.concat([tf.concat(self.weights['W_mlp_local_%d' %k] * test_embeddings, 0), last_embedding], 0)
-            # , self.weights['W_mlp_local_%d_last' %k] * last_embedding], 0)
-            # print(test_prod.shape)
 
             ## CONVOLUTION
             # line 2 in algorithm 1 [RM-GCN, KDD'2018], aggregating the previsou embeddings
-            # print("Pre Conv: ", pre_embeddings.shape, embeddings.shape, self.n_fold, self.weights['W_mlp_%d' % k].shape, self.weights['user_embed'].shape, self.weights['entity_embed'].shape)
 
             pre_norm_embeddings = tf.concat([pre_embeddings, embeddings], 1)
             embeddings = tf.convert_to_tensor([pre_embeddings, embeddings])
 
+            # GRAPHSAGE Implementation
             # pre_embeddings = tf.nn.relu(
             #     tf.matmul(embeddings, self.weights['W_mlp_%d' % k]) + self.weights['b_mlp_%d' % k])
 
@@ -413,7 +409,6 @@ class KGAT(object):
 
             all_embeddings += [norm_embeddings]
 
-        print([i.shape for i in all_embeddings])
         all_embeddings = tf.concat(all_embeddings, 1)
 
         ua_embeddings, ea_embeddings = tf.split(all_embeddings, [self.n_users, self.n_entities], 0)
